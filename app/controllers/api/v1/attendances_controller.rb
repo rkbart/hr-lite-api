@@ -1,20 +1,21 @@
-class Api::AttendancesController < ApplicationController
-   before_action :authenticate_user!
-    before_action :set_attendance, only: [ :show, :update, :destroy ]
+class Api::V1::AttendancesController < ApplicationController
+  # before_action :authenticate_user!
+  before_action :set_dummy_user
+  before_action :set_attendance, only: [ :show, :update, :destroy ]
 
-    # GET /api/attendances
+    # GET /api/v1/attendances
     def index
       attendances = current_user.attendances.order(date: :desc)
       attendances = attendances.where(date: params[:start_date]..params[:end_date]) if params[:start_date] && params[:end_date]
       render json: attendances
     end
 
-    # GET /api/attendances/:id
+    # GET /api/v1/attendances/:id
     def show
       render json: @attendance
     end
 
-    # POST /api/attendances
+    # POST /api/v1/attendances
     def create
       attendance = current_user.attendances.new(attendance_params)
       if attendance.save
@@ -24,7 +25,7 @@ class Api::AttendancesController < ApplicationController
       end
     end
 
-    # PATCH/PUT /api/attendances/:id
+    # PATCH/PUT /api/v1/attendances/:id
     def update
       if @attendance.update(attendance_params)
         render json: @attendance
@@ -33,13 +34,13 @@ class Api::AttendancesController < ApplicationController
       end
     end
 
-    # DELETE /api/attendances/:id
+    # DELETE /api/v1/attendances/:id
     def destroy
       @attendance.destroy
       head :no_content
     end
 
-    # POST /api/attendances/clock_in
+    # POST /api/v1/attendances/clock_in
     def clock_in
       today = Date.current
       existing = current_user.attendances.find_by(date: today)
@@ -51,7 +52,7 @@ class Api::AttendancesController < ApplicationController
       end
     end
 
-    # POST /api/attendances/clock_out
+    # POST /api/v1/attendances/clock_out
     def clock_out
       today = Date.current
       attendance = current_user.attendances.find_by(date: today)
@@ -65,7 +66,7 @@ class Api::AttendancesController < ApplicationController
       end
     end
 
-    # GET /api/attendances/summary?date=YYYY-MM-DD
+    # GET /api/v1/attendances/summary?date=YYYY-MM-DD
     def summary
       date = params[:date] ? Date.parse(params[:date]) : Date.current
       attendance = current_user.attendances.find_by(date: date)
@@ -84,5 +85,13 @@ class Api::AttendancesController < ApplicationController
 
     def attendance_params
       params.require(:attendance).permit(:date, :clock_in, :clock_out, :total_hours)
+    end
+
+    def set_dummy_user
+      @current_user = User.first
+    end
+
+    def current_user
+      @current_user
     end
 end
