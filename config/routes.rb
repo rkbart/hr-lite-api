@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users
+      resources :leaves
       resources :attendances do
         collection do
           post :clock_in
